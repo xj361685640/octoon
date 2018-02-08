@@ -1,33 +1,20 @@
-#include <QApplication>
-#include <QFile>
-#include <QDebug>
-#include <QCoreApplication>
-#include <QDir>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
 
-#include <octoon/editor/mainwindow.h>
-#include <octoon/editor/OMainWindow.h>
 #include <octoon/editor/qtmain.h>
-
-
-QString getQssContent(const QString &path)
-{
-	QFile styleSheet(path);
-	if (!styleSheet.open(QIODevice::ReadOnly))
-	{
-		qWarning("Can't open the style sheet file.");
-		qDebug() << QDir::currentPath();
-		return "";
-	}
-	return styleSheet.readAll();
-}
 
 int qtmain(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    octoon::editor::OMainWindow w;
-    w.show();
+#if defined(Q_OS_WIN)
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
 
-	a.setStyleSheet(getQssContent("resource/qss/default_qss.qss"));
+    QGuiApplication app(argc, argv);
 
-    return a.exec();
+    QQmlApplicationEngine engine;
+    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
+    if (engine.rootObjects().isEmpty())
+        return -1;
+
+    return app.exec();
 }

@@ -4,28 +4,29 @@ SET(HEADER_PATH ${COTOON_HEADER_PATH}/${LIB_NAME})
 SET(SOURCE_PATH ${COTOON_SOURCE_PATH}/${LIB_NAME})
 
 SET(EDITOR_LIST
-${HEADER_PATH}/mainwindow.h
-${SOURCE_PATH}/mainwindow.cpp
 ${HEADER_PATH}/qtmain.h
 ${SOURCE_PATH}/qtmain.cpp
-${HEADER_PATH}/OMainWindow.h
-${HEADER_PATH}/OTitleBar.h
 )
 SOURCE_GROUP(${LIB_NAME} FILES ${EDITOR_LIST})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
-set(Qt5Widgets_DIR ${QT_INCLUDE_PATH})
-# Find the QtWidgets library
-find_package(Qt5Widgets)
+# set(CMAKE_AUTOMOC ON)
+
+# add resources
+set(Qt5_DIR ${QT_INCLUDE_PATH}/Qt5)
+find_package(Qt5 COMPONENTS Quick Core Network)
+qt5_add_resources(RESOURCES qml.qrc)
 
 ADD_DEFINITIONS(-D_BUILD_DLL_EXPORT)
-ADD_LIBRARY(${LIB_NAME} SHARED ${EDITOR_LIST})
-# Use the Widgets module from Qt 5.x
-TARGET_LINK_LIBRARIES(${LIB_NAME} Qt5::Widgets)
+ADD_LIBRARY(${LIB_NAME} SHARED ${EDITOR_LIST} ${RESOURCES})
+
+qt5_use_modules(${LIB_NAME} Quick Core Network)
+
 
 SET_TARGET_ATTRIBUTE(${LIB_NAME} "core")
 
 # copy resources
 file(COPY ${PROJECT_SOURCE_DIR}/resource DESTINATION ${LIBRARY_OUTPUT_PATH})
+file(COPY ${COTOON_SOURCE_PATH}/${LIB_NAME}/qml DESTINATION ${LIBRARY_OUTPUT_PATH})
+# file(COPY ${COTOON_SOURCE_PATH}/${LIB_NAME}/${RESOURCESss} DESTINATION ${LIBRARY_OUTPUT_PATH})
