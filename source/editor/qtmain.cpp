@@ -1,20 +1,26 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
+#include <octoon\editor\qtmain.h>
+#include <octoon\editor\mainwindow.h>
+#include <QApplication>
+#include <QFile>
 
-#include <octoon/editor/qtmain.h>
+QString getQssContent(const QString &path)
+{
+	QFile styleSheet(path);
+	if (!styleSheet.open(QIODevice::ReadOnly))
+	{
+		qWarning("Can't open the style sheet file.");
+		return "";
+	}
+	return styleSheet.readAll();
+}
 
 int qtmain(int argc, char *argv[])
 {
-#if defined(Q_OS_WIN)
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
+	QApplication a(argc, argv);
+	MainWindow w;
+	w.show();
 
-    QGuiApplication app(argc, argv);
+	a.setStyleSheet(getQssContent(":/qss/default_qss.qss"));
 
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
-    if (engine.rootObjects().isEmpty())
-        return -1;
-
-    return app.exec();
+	return a.exec();
 }
